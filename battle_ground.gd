@@ -8,6 +8,8 @@
 
 extends Node2D
 
+var Track = preload("track.gd")
+
 
 # Generating
 var min_branch = 5  # How long should the branches be at minimum; Putting in 0 breaks things
@@ -285,12 +287,10 @@ func draw_rail(rail, color):
 	draw_end(node1, node2, color)
 
 func draw_track(track):
-	# var color = 0
-	for rail in track:
-		var color = randi() % colors.size() #
+	for rail in track.rails:
+		var color = randi() % colors.size()
 		draw_rail(rail, colors[color])
-		colors.remove(color) #
-		# color += 1
+		colors.remove(color) 
 
 
 # Controll
@@ -299,4 +299,5 @@ func _ready():
 	
 func _draw():
 	draw_grid(gap)
-	draw_track(generate_track(graph, 16, 9))
+	# draw_track(generate_track(graph, 16, 9))
+	draw_track(Track(graph, 16, 9))

@@ -6,7 +6,8 @@ var graph = [       # Graph respresenting relations between rails; Track is gene
 	[2, 0],
 	[0, 0]
 ]
-var nodes = []  # For storing values of nodes; Exceptions: 0 = occupied, 2147483647 = uninitialized
+var nodes = []      # For storing values of nodes; Exceptions: 0 = occupied, 2147483647 = uninitialized
+var rails = []      # For storing individual rail objects; TODO: Maybe define get method
 
 
 # -- Functions -- 
@@ -24,7 +25,7 @@ func _init(graph, node_count_x, node_count_y):
 		nodes.append(a)
 	
 	# Create rail (testing)
-	rail = Rail()
+	rails.append(Rail())
 
 func get_neighbors(pos_x, pos_y):
 	""" Returns array of positions of neighbors of a node at pos position """
@@ -46,9 +47,9 @@ func get_neighbors(pos_x, pos_y):
 	# Return the valid neighbors
 	return result
 
-func get_max_value_neighbors(x, y):
-	""" Returns array of positions of neighbors of a node at xy; Only those with the highest value are returned """
-	var neighbors = get_neighbors(x, y)
+func get_max_value_neighbors(pos_x, pos_y):
+	""" Returns array of positions of neighbors of a node at pos_x, pos_y; Only those with the highest value are returned """
+	var neighbors = get_neighbors(pos_x, pos_y)
 	var max_value = 0
 	var result = []
 	for neighbor in neighbors:
@@ -60,9 +61,9 @@ func get_max_value_neighbors(x, y):
 			result.append(neighbor)
 	return result
 
-func set_neighbor_nodes(x, y, value):
+func set_neighbor_nodes(pos_x, pos_y, value):
 	""" Sets neighbor nodes values to a value; Ignores nodes with a smaller value """
-	for neighbor in get_neighbors(x, y):
+	for neighbor in get_neighbors(pos_x, pos_y):
 		x = neighbor[0]
 		y = neighbor[1]
 		if not nodes[x][y] <= value:  # Ignore smaller value nodes
@@ -83,55 +84,58 @@ func clear_nodes():
 # -- Inner classes --
 
 class Rail:
+	var track      # Reference to the outer track object; Workaround for GDScript not providing outer object reference to inner object
 	var path = []  # For storing nodes of the rail (their [x, y])
 	
-	func _init():
+	func _init(track):
 		""" Constructor """
+		self.track = track
+		
 		# Generate a random position; That will be the path origin
-		var origin_x = (randi() % (node_count_x - 2)) + 1
-		var origin_y = (randi() % (node_count_y - 2)) + 1
+		var origin_x = (randi() % (track.nodes.size - 2)) + 1  # We generate the position so that the origin can't be on the edge of nodes array
+		var origin_y = (randi() % (track.nodes[0].size - 2)) + 1
 		
 		# Create the base; Either...
 		if randi() % 2:  # ...horizontally
 			path.append([origin_x - 1, origin_y])
-			nodes[origin_x - 1][origin_y] = 0
+			track.nodes[origin_x - 1][origin_y] = 0
 			# path.append([origin_x, origin_y]) is not needed
-			nodes[origin_x][origin_y] = 0
+			track.nodes[origin_x][origin_y] = 0
 			path.append([origin_x + 1, origin_y])
-			nodes[origin_x + 1][origin_y] = 0
+			track.nodes[origin_x + 1][origin_y] = 0
 		else:            # ...or vertically
 			path.append([origin_x, origin_y - 1])
-			nodes[origin_x][origin_y - 1] = 0
+			track.nodes[origin_x][origin_y - 1] = 0
 			# path.append([origin_x, origin_y]) is not needed
-			nodes[origin_x][origin_y] = 0
+			track.nodes[origin_x][origin_y] = 0
 			path.append([origin_x, origin_y + 1])
-			nodes[origin_x][origin_y + 1] = 0
+			track.nodes[origin_x][origin_y + 1] = 0
 			
 		# Grow branches from each side
 		path = path + grow_branch(path[1])           # From the back
 		path = grow_branch(path[0]).invert() + path  # From the front
 	
-	func grow_branch(start_node):  # TODO: More different types of growing; Anticipating bad branches
+	func grow_branch(start_x, start_y):  # TODO: More different types of growing; Anticipating bad branches
 		""" Grows a branch and returns its path """
-		result = []
+		var result = []
 		
 		# We will be using node valus -> we need to evaluate them first
 		evaluate_nodes()
 		
 		# Start with the starting node
-		var curr_node = [start_node[0], start_node[1]]
+		var curr_node = [start_x, start_y]
 		
 		# This type of growing is not ideal - TODO: Different growing
 		# The branch grows a section every cycle
 		var count = 0
-		while count < min_branch:
+		while count < track.min_branch:
 			# Get the neighbors with max value
-			var neighbors = get_max_value_neighbors(nodes, curr_node[0], curr_node[1])
+			var neighbors = get_max_value_neighbors(track.nodes, curr_node[0], curr_node[1])
 			
 			# Choose a random neighbor and add him to the branch
 			curr_node = neighbors[randi() % neighbors.size()]
 			result.append([curr_node[0], curr_node[1]])
-			nodes[curr_node[0]][curr_node[1]] = 0
+			track.nodes[curr_node[0]][curr_node[1]] = 0
 			
 			# We now continue the cycle again, but on the chosen node
 			count += 1
