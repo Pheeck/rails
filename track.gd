@@ -1,12 +1,14 @@
 # -- Member variables --
 
+const MAX_INT = 2147483647
+
 var min_branch = 5  # How long should the branches be at minimum; Putting in 0 breaks things
 var graph = [       # Graph respresenting relations between rails; Track is generated from it
 	[1, 0],
 	[2, 0],
 	[0, 0]
 ]
-var nodes = []      # For storing values of nodes; Exceptions: 0 = occupied, 2147483647 = uninitialized
+var nodes = []      # For storing values of nodes; Exceptions: 0 = occupied, MAX_INT = uninitialized
 var rails = []      # For storing individual rail objects; TODO: Maybe define get method
 
 
@@ -17,11 +19,11 @@ func _init(graph, node_count_x, node_count_y):
 	node_count_x = int(node_count_x)
 	node_count_y = int(node_count_y)
 	
-	# Fill nodes array with 2147483647
+	# Fill nodes array with MAX_INT
 	for i in range(node_count_x):
 		var a = []
 		for j in range(node_count_y):
-			a.append(2147483647)
+			a.append(MAX_INT)
 		nodes.append(a)
 	
 	# Create rail (testing)
@@ -70,13 +72,13 @@ func set_neighbor_nodes(pos_x, pos_y, value):
 			nodes[x][y] = value
 
 func clear_nodes():
-	""" Clear values (give those nodes 2147483647) in a nodes (0 stays) """
+	""" Clear values (give those nodes MAX_INT) in a nodes (0 stays) """
 	var x = 0
 	while x < nodes.size():
 		var y = 0
 		while y < nodes[0].size():
 			if nodes[x][y] != 0:
-				nodes[x][y] = 2147483647
+				nodes[x][y] = MAX_INT
 			y += 1
 		x += 1
 

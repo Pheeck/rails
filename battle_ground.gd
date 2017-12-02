@@ -9,6 +9,7 @@
 extends Node2D
 
 var Track = preload("track.gd")
+var Dijkstra = preload("dijkstra.gd")
 
 
 # Pregenerated
@@ -124,7 +125,8 @@ func draw_track(track):
 # Controll
 func _ready():
 	randomize()
-	
+	Dijkstra.test()
+
 func _draw():
 	draw_grid(gap)
 	draw_track(Track.new([], 15, 9))  # TODO: Graph
