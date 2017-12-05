@@ -1,6 +1,6 @@
 Nesmí existovat cesta s délkou <= MIN_PATH, co by měla hodnotu > MAX_INT / 2
 Potřeba MIN_PATH proměnné
 
-Dijkstrův algoritmus, co se snaží najít co nejvýše ohodnocenout cestu - použijeme obyčejný algoritmus, akorát místo hodnot x bude y - x, kde y je maximální možná hodnota x, která by neměla být moc velká
+Dijkstrův algoritmus, co se snaží najít co nejvýše ohodnocenout cestu 
 Hrany jsou ohodnoceny podle hodnot vrcholů (nodů) do kterých vedou
 Jakmile vyhodnocujeme vrchol, ke kterému vede cesta o délce <= MIN_PATH, přidáváme k jeho hodnotě MAX_INT / 2

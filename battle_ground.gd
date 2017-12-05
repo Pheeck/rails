@@ -129,4 +129,4 @@ func _ready():
 
 func _draw():
 	draw_grid(gap)
-	draw_track(Track.new([], 15, 9))  # TODO: Graph
+	draw_track(Track.new([], 15, 9))  # TODO: Real graph instead of []
