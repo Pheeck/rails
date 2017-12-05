@@ -9,7 +9,7 @@
 extends Node2D
 
 var Track = preload("track.gd")
-var Dijkstra = preload("dijkstra.gd")
+var Dijkstra = preload("dijkstra_modified.gd")
 
 
 # Pregenerated
